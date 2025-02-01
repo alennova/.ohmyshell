@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 # Default commit message
 COMMIT_MSG="Auto commit - $(date +'%Y-%m-%d %H:%M:%S')"
