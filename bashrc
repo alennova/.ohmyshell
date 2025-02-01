@@ -3,7 +3,7 @@ if [ -f ~/.ohmyshell/aliases ]; then
 fi
 
 # Add the ~/scripts folder itself first
-PATH="$HOME/.ohmyshell/scripts:$PATH"
+PATH="/c/Program Files/Sublime Text:$HOME/.ohmyshell/scripts:$PATH"
 
 # Loop through subdirectories of ~/scripts and add them to PATH
 for dir in "$HOME/.ohmyshell/scripts"/*/; do
