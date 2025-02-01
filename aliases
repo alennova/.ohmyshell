@@ -1,0 +1,1 @@
+alias arp-scann='sudo arp-scan -m /usr/share/arp-scan/ieee-oui.txt -lg'
