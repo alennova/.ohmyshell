@@ -46,13 +46,8 @@ for plugin in "${!plugins[@]}"; do
     fi
 done
 
-# Update .zshrc file
-if grep -q "^plugins=(" "$HOME/.zshrc"; then
-    # Properly quote the array when expanding it
-    sed -i "s/^plugins=(.*)/plugins=($(printf "%s " "${installed_plugins[@]}"))/" "$HOME/.zshrc"
-else
-    echo "plugins=($(printf "%s " "${installed_plugins[@]}"))" >> "$HOME/.zshrc"
-fi
+# Add additional configuration to .ohmyshell/zshrc file
+echo "plugins=(${installed_plugins[*]})" >> "$HOME/.ohmyshell/zshrc"
 
 # Add additional configuration to .zshrc
 ZSHRC="[[ -f ~/.ohmyshell/zshrc ]] && source ~/.ohmyshell/zshrc"
