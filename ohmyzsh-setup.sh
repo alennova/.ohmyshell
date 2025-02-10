@@ -1,61 +1,45 @@
-#!/usr/bin/bash
+#!/bin/bash
 
-# Check if zsh and git are installed
-if ! command -v zsh &> /dev/null || ! command -v git &> /dev/null; then
-    echo "Installing zsh and git..."
-    sudo apt update && sudo apt install -y zsh git
+# Install zsh and git (handling both apt and pkg)
+if command -v apt &> /dev/null; then
+  sudo apt install zsh git -y
+elif command -v pkg &> /dev/null; then
+  pkg install zsh git
 else
-    echo "zsh and git are already installed."
+  echo "No package manager (apt or pkg) found. Please install zsh and git manually."
+  exit 1
 fi
 
-# Check if Oh My Zsh is already installed
-if [ -d "$HOME/.oh-my-zsh" ]; then
-    echo "Oh My Zsh is already installed."
-else
-    echo "Installing Oh My Zsh..."
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+# Install Oh My Zsh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+# Install zsh plugins
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
+git clone https://github.com/zsh-users/zsh-autosuggestions.git "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
+
+# Check if ZSH_CUSTOM is defined, otherwise use the default
+ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+git clone https://github.com/zdharma-continuum/fast-syntax-highlighting.git "$ZSH_CUSTOM/plugins/fast-syntax-highlighting"
+
+
+# Add plugins to ~/.zshrc  (More robust method)
+plugins_to_add=(git zsh-autosuggestions zsh-syntax-highlighting fast-syntax-highlighting)
+
+# Check if .zshrc exists, if not create it
+if [ ! -f ~/.zshrc ]; then
+  touch ~/.zshrc
 fi
 
-# Define plugins and their repositories
-declare -A plugins
-plugins=(
-    [zsh-syntax-highlighting]="https://github.com/zsh-users/zsh-syntax-highlighting.git"
-    [zsh-autosuggestions]="https://github.com/zsh-users/zsh-autosuggestions.git"
-    [fast-syntax-highlighting]="https://github.com/zdharma-continuum/fast-syntax-highlighting.git"
-)
+# Use sed to add the plugins line, avoiding duplicates and handling existing plugins
+sed -i -E "s/plugins=\((.*)\)/plugins=(\1 ${plugins_to_add[@]})/g" ~/.zshrc
 
-ZSH_CUSTOM=${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}
-mkdir -p "$ZSH_CUSTOM/plugins"
-
-installed_plugins=(git)
-
-# Prompt user for each plugin installation
-for plugin in "${!plugins[@]}"; do
-    read -p "Do you want to install $plugin? [Y/n] " response
-    response=${response,,}  # Convert to lowercase
-    if [[ -z "$response" || "$response" == "y" ]]; then
-        if [ -d "$ZSH_CUSTOM/plugins/$plugin" ]; then
-            echo "$plugin is already installed."
-        else
-            echo "Installing $plugin..."
-            git clone "${plugins[$plugin]}" "$ZSH_CUSTOM/plugins/$plugin"
-            installed_plugins+=("$plugin")
-        fi
-    else
-        echo "Skipping $plugin."
-    fi
-done
-
-# Add additional configuration to .ohmyshell/zshrc file
-echo "plugins=(${installed_plugins[*]})" >> "$HOME/.ohmyshell/zshrc"
-
-# Add additional configuration to .zshrc
-ZSHRC="[[ -f ~/.ohmyshell/zshrc ]] && source ~/.ohmyshell/zshrc"
-if ! grep -Fxq "$ZSHRC" "$HOME/.zshrc"; then
-    echo "$ZSHRC" >> "$HOME/.zshrc"
-    echo "[[ -f ~/.ohmyshell/zshrc ]] && source ~/.ohmyshell/zshrc added to ~/.zshrc"
-else
-    echo "[[ -f ~/.ohmyshell/zshrc ]] && source ~/.ohmyshell/zshrc already exists in ~/.zshrc"
+# If the plugins line doesn't exist, add it. This is a fallback in case the regex doesn't match.
+if ! grep -q "plugins=" ~/.zshrc; then
+  echo "plugins=(${plugins_to_add[@]})" >> ~/.zshrc
 fi
 
-echo "Installation complete. Restart the terminal or run 'exec zsh' to apply changes."
+
+# Source the .zshrc file to apply changes immediately (optional but recommended)
+source ~/.zshrc
+
+echo "Oh My Zsh and plugins installed successfully!"
