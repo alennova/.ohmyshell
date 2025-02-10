@@ -48,9 +48,10 @@ done
 
 # Update .zshrc file
 if grep -q "^plugins=(" "$HOME/.zshrc"; then
-    sed -i "s/^plugins=(.*)/plugins=(${installed_plugins[*]})/" "$HOME/.zshrc"
+    # Properly quote the array when expanding it
+    sed -i "s/^plugins=(.*)/plugins=($(printf "%s " "${installed_plugins[@]}"))/" "$HOME/.zshrc"
 else
-    echo "plugins=(${installed_plugins[*]})" >> "$HOME/.zshrc"
+    echo "plugins=($(printf "%s " "${installed_plugins[@]}"))" >> "$HOME/.zshrc"
 fi
 
 # Add additional configuration to .zshrc
