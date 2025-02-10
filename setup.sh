@@ -7,15 +7,15 @@ ZSHRC="[[ -f ~/.ohmyshell/zshrc ]] && source ~/.ohmyshell/zshrc"
 # Check if the line already exists in ~/.bashrc
 if ! grep -Fxq "$BASHRC" ~/.bashrc; then
     echo "$BASHRC" >> ~/.bashrc
-    echo "Line added to ~/.bashrc"
+    echo "[[ -f ~/.ohmyshell/bashrc ]] && source ~/.ohmyshell/bashrc added to ~/.bashrc"
 else
-    echo "Line already exists in ~/.bashrc"
+    echo "[[ -f ~/.ohmyshell/bashrc ]] && source ~/.ohmyshell/bashrc already exists in ~/.bashrc"
 fi
 
 # Check if the line already exists in ~/.zshrc
 if ! grep -Fxq "$ZSHRC" ~/.zshrc; then
     echo "$ZSHRC" >> ~/.zshrc
-    echo "Line added to ~/.zshrc"
+    echo "[[ -f ~/.ohmyshell/zshrc ]] && source ~/.ohmyshell/zshrc added to ~/.zshrc"
 else
-    echo "Line already exists in ~/.zshrc"
+    echo "[[ -f ~/.ohmyshell/zshrc ]] && source ~/.ohmyshell/zshrc already exists in ~/.zshrc"
 fi
